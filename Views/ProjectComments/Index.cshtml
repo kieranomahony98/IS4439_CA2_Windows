@@ -1,0 +1,55 @@
+﻿@model IEnumerable<IS4439_CA2.Models.ProjectComments>
+
+@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>Index</title>
+</head>
+<body>
+<p>
+    <a asp-action="Create">Create New</a>
+</p>
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.CommentText)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.CommentTimeStamp)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Project)
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+@foreach (var item in Model) {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.CommentText)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.CommentTimeStamp)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Project.ProjectsID)
+            </td>
+            <td>
+                <a asp-action="Edit" asp-route-id="@item.ProjectCommentsID">Edit</a> |
+                <a asp-action="Details" asp-route-id="@item.ProjectCommentsID">Details</a> |
+                <a asp-action="Delete" asp-route-id="@item.ProjectCommentsID">Delete</a>
+            </td>
+        </tr>
+}
+    </tbody>
+</table>
+</body>
+</html>
