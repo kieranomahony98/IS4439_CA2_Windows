@@ -7,11 +7,11 @@ using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
-namespace IS4439_CA2.Data.Migrations
+namespace IS4439_CA2.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20201222204959_AppUsers")]
-    partial class AppUsers
+    [Migration("20201226142257_PendingChange")]
+    partial class PendingChange
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -33,15 +33,15 @@ namespace IS4439_CA2.Data.Migrations
                         .IsConcurrencyToken()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<DateTime>("DOB")
-                        .HasColumnType("datetime2");
-
                     b.Property<string>("Email")
                         .HasColumnType("nvarchar(256)")
                         .HasMaxLength(256);
 
                     b.Property<bool>("EmailConfirmed")
                         .HasColumnType("bit");
+
+                    b.Property<string>("FullName")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<bool>("IsAdmin")
                         .HasColumnType("bit");
@@ -82,9 +82,6 @@ namespace IS4439_CA2.Data.Migrations
                         .HasColumnType("nvarchar(256)")
                         .HasMaxLength(256);
 
-                    b.Property<string>("fullName")
-                        .HasColumnType("nvarchar(max)");
-
                     b.HasKey("Id");
 
                     b.HasIndex("NormalizedEmail")
@@ -105,7 +102,11 @@ namespace IS4439_CA2.Data.Migrations
                         .HasColumnType("int")
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
+                    b.Property<string>("ApplicationUserID")
+                        .HasColumnType("nvarchar(450)");
+
                     b.Property<string>("CommentText")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime>("CommentTimeStamp")
@@ -114,17 +115,11 @@ namespace IS4439_CA2.Data.Migrations
                     b.Property<int>("ProjectId")
                         .HasColumnType("int");
 
-                    b.Property<int>("UserID")
-                        .HasColumnType("int");
-
-                    b.Property<string>("applicationUserId")
-                        .HasColumnType("nvarchar(450)");
-
                     b.HasKey("ProjectCommentsID");
 
-                    b.HasIndex("ProjectId");
+                    b.HasIndex("ApplicationUserID");
 
-                    b.HasIndex("applicationUserId");
+                    b.HasIndex("ProjectId");
 
                     b.ToTable("ProjectComments");
                 });
@@ -140,6 +135,7 @@ namespace IS4439_CA2.Data.Migrations
                         .HasColumnType("int");
 
                     b.Property<string>("imageRoute")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("ProjectImagesID");
@@ -177,15 +173,19 @@ namespace IS4439_CA2.Data.Migrations
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
                     b.Property<string>("DateCompleted")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("ProjectDescription")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("ProjectTitle")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Resolution")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<bool>("isVideo")
@@ -333,15 +333,15 @@ namespace IS4439_CA2.Data.Migrations
 
             modelBuilder.Entity("IS4439_CA2.Models.ProjectComments", b =>
                 {
+                    b.HasOne("IS4439_CA2.Models.ApplicationUser", "ApplicationUser")
+                        .WithMany("projectComments")
+                        .HasForeignKey("ApplicationUserID");
+
                     b.HasOne("IS4439_CA2.Models.Projects", "Project")
                         .WithMany("ProjectCommentsID")
                         .HasForeignKey("ProjectId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-
-                    b.HasOne("IS4439_CA2.Models.ApplicationUser", "applicationUser")
-                        .WithMany("projectComments")
-                        .HasForeignKey("applicationUserId");
                 });
 
             modelBuilder.Entity("IS4439_CA2.Models.ProjectImages", b =>

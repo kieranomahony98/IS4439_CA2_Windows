@@ -22,20 +22,31 @@ namespace IS4439_CA2.Areas.Identity.Pages.Account.Manage
             _userManager = userManager;
             _signInManager = signInManager;
         }
-
         public string Username { get; set; }
+
 
         [TempData]
         public string StatusMessage { get; set; }
 
+        
         [BindProperty]
         public InputModel Input { get; set; }
 
         public class InputModel
         {
+
+
+
             [Phone]
             [Display(Name = "Phone number")]
             public string PhoneNumber { get; set; }
+            [Required(ErrorMessage = "Please enter your Full Name")]
+            [Display(Name = "Full Name")]
+            public string FullName { get; set; }
+
+            [Required(ErrorMessage = "Please enter your Occupation")]
+            public string Occupation { get; set; }
+
         }
 
         private async Task LoadAsync(ApplicationUser user)
@@ -47,7 +58,9 @@ namespace IS4439_CA2.Areas.Identity.Pages.Account.Manage
 
             Input = new InputModel
             {
-                PhoneNumber = phoneNumber
+                PhoneNumber = phoneNumber,
+                FullName = user.FullName,
+                Occupation = user.Occupation
             };
         }
 
@@ -87,7 +100,11 @@ namespace IS4439_CA2.Areas.Identity.Pages.Account.Manage
                     return RedirectToPage();
                 }
             }
+            if (Input.FullName != user.FullName) user.FullName = Input.FullName;
+            if (Input.Occupation!= user.Occupation) user.Occupation = Input.Occupation;
 
+          
+            await _userManager.UpdateAsync(user);
             await _signInManager.RefreshSignInAsync(user);
             StatusMessage = "Your profile has been updated";
             return RedirectToPage();

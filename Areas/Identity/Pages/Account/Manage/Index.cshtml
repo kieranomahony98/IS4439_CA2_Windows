@@ -13,7 +13,15 @@
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             <div class="form-group">
                 <label asp-for="Username"></label>
-                <input asp-for="Username" class="form-control" disabled />
+                <input asp-for="Username" class="form-control" disabled/>
+            </div>
+            <div class="form-group">
+                <label asp-for="Input.FullName"></label>
+                <input asp-for="Input.FullName" class="form-control" />
+            </div>
+            <div class="form-group">
+                <label asp-for="Input.Occupation"></label>
+                <input asp-for="Input.Occupation" class="form-control" />
             </div>
             <div class="form-group">
                 <label asp-for="Input.PhoneNumber"></label>

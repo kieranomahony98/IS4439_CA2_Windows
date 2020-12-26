@@ -1,0 +1,42 @@
+﻿@model IEnumerable<IS4439_CA2.Models.Projects>
+
+
+<div class="container-fluid tm-container-content tm-mt-60">
+    <div class="row mb-4">
+        <h2 class="col-6 tm-text-primary">
+            Latest Projects
+        </h2>
+        <div class="col-6 d-flex justify-content-end align-items-center">
+            <h2" class="tm-text-primary">
+                Click to view
+            </h2">
+        </div>
+    </div>
+    <div class="row tm-mb-90 tm-gallery">
+        @{
+            int i = 0;
+            foreach (var item in Model)
+            {
+                <div class="col-xl-4 col-lg-4 col-md-6 col-sm-6 col-3 mb-5">
+                            <figure class="effect-ming tm-video-item">
+
+                   
+                                <video autoplay muted loop controls id="tm-video">
+                                    <source src="@Url.Content(String.Format(item.ProjectImages[0].imageRoute))" type="video/mp4">
+                                </video>
+                                <figcaption class="d-flex align-items-center justify-content-center">
+                                    <h2>@Html.DisplayFor(modelItem => item.ProjectTitle)</h2>
+                                    <a asp-controller="Projects" asp-action="Details" asp-route-id="@item.ProjectsID">View more</a>
+                                </figcaption>
+                            </figure>
+                    <div class="d-flex justify-content-between tm-text-gray">
+                        <span class="tm-text-gray-light"> @Html.DisplayFor(modelItem => item.DateCompleted)</span>
+                    </div>
+                </div>
+                i++;
+            }
+        }
+    </div>
+</div>
+
+

@@ -14,30 +14,37 @@ using System.Net.Http.Headers;
 using System.IO;
 using System.Text.RegularExpressions;
 using Microsoft.Extensions.Hosting;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Authorization;
 
 namespace IS4439_CA2.Controllers
 {
     public class ProjectsController : Controller
     {
         private readonly ApplicationDbContext _context;
-  
-        public ProjectsController(ApplicationDbContext context)
+        private readonly UserManager<ApplicationUser> _User;
+        public ProjectsController(ApplicationDbContext context, UserManager<ApplicationUser> user)
         {
             _context = context;
+            _User = user;
+        }
 
+        private async Task<ApplicationUser> GetCurrentUser()
+        {
+            return await _User.GetUserAsync(HttpContext.User);
         }
 
         // GET: Projects
         public async Task<IActionResult> Index()
-        {
+        {   
             IEnumerable<Projects> p = await _context.Projects
                 .Where(p => p.isVideo == false)
                 .Include(c => c.ProjectImages)
                 .ToListAsync();
             return View(p);
         }
-        [Route("/VideoProjects")]
-        public async Task<IActionResult> VideoProjects()
+
+        public async Task<IActionResult> Videos()
         {
             IEnumerable<Projects> p = await _context.Projects
                 .Where(p => p.isVideo == true)
@@ -45,22 +52,6 @@ namespace IS4439_CA2.Controllers
                 .ToListAsync();
             return View(p);
         }
-
-        [HttpPost]
-        public async Task<IActionResult> AddComment([Bind("CommentText,ProjectId")] ProjectComments projectComments)
-        {
-            projectComments.CommentTimeStamp = DateTime.Today;
-            Debug.WriteLine(User.FindFirstValue(ClaimTypes.NameIdentifier));
-            projectComments.UserID =  Int32.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
-            if (ModelState.IsValid)
-            {
-                _context.ProjectComments.Add(projectComments);
-                await _context.SaveChangesAsync();
-                return RedirectToAction(actionName: "Details", new { projectComments.ProjectCommentsID });
-            }
-            return RedirectToAction(actionName: "Details", new { projectComments.ProjectCommentsID });
-        }
-
 
         // GET: Projects/Details/5
         public async Task<IActionResult> Details(int? id)
@@ -73,8 +64,9 @@ namespace IS4439_CA2.Controllers
 
             var projects = await _context.Projects
                 .Include(c => c.ProjectImages)
-                .Include(b => b.ProjectCommentsID)
+                .Include(b => b.ProjectCommentsID).ThenInclude(c => c.ApplicationUser)
                 .FirstOrDefaultAsync(m => m.ProjectsID == id);
+
 
             if (projects == null)
             {
@@ -85,8 +77,17 @@ namespace IS4439_CA2.Controllers
         }
 
         // GET: Projects/Create
-        public IActionResult Create()
+        public async Task<IActionResult> Create()
         {
+            var user = await GetCurrentUser();
+
+            if (!user.IsAdmin)
+            {
+                //Assigning my own status code just for completion to the end user
+                ViewData["Error"] = "401: You do not have the appropiate permissions to create projects!";
+                return RedirectToAction(nameof(Index));
+            }
+
             return View();
         }
 
@@ -95,13 +96,21 @@ namespace IS4439_CA2.Controllers
         // more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorize]
         public async Task<IActionResult> Create(IFormFileCollection formFiles, int ProjectsID, string ProjectDescription, string ProjectTitle, string DateCompleted, string Resolution, bool isVideo)
         {
             if (formFiles == null)
             {
-                ViewBag["Error"] = "Please uploade at least one image!";
+                ViewData["Error"] = "Please uploade at least one image!";
                 return View();
             }
+            var user = await GetCurrentUser();
+
+            if (!user.IsAdmin)
+            {
+                return RedirectToAction(nameof(Index));
+            }
+
             Projects newProject = new Projects() { DateCompleted = DateCompleted, isVideo = isVideo, ProjectDescription = ProjectDescription, ProjectTitle = ProjectTitle, Resolution = Resolution };
             if (ModelState.IsValid)
             {
@@ -140,13 +149,20 @@ namespace IS4439_CA2.Controllers
         }
 
         // GET: Projects/Edit/5
+        [Authorize]
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null)
             {
                 return NotFound();
             }
-
+            ApplicationUser applicationUser = await GetCurrentUser();
+            if (!applicationUser.IsAdmin)
+            {
+                //Assigning my own status code just for completion to the end user
+                ViewData["Error"] = "401: You do not have the appropiate permissions to create projects!";
+                return RedirectToAction("Details");
+            }
             var projects = await _context.Projects.FindAsync(id);
             if (projects == null)
             {
@@ -157,6 +173,7 @@ namespace IS4439_CA2.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorize]
         public async Task<IActionResult> Edit(int id, [Bind("ProjectsID,ProjectDescription,ProjectTitle,DateCompleted,Resolution,isVideo")] Projects projects)
         {
             if (id != projects.ProjectsID)
@@ -188,8 +205,18 @@ namespace IS4439_CA2.Controllers
         }
 
         // GET: Projects/Delete/5
+        [Authorize]
         public async Task<IActionResult> Delete(int? id)
         {
+
+            ApplicationUser applicationUser = await GetCurrentUser();
+            if (!applicationUser.IsAdmin)
+            {
+                //Assigning my own status code just for completion to the end user
+                TempData["Error"] = "401: You do not have the appropiate permissions to create projects!";
+                return RedirectToAction("Details");
+            }
+
             if (id == null)
             {
                 return NotFound();

@@ -69,3 +69,12 @@ body {
   white-space: nowrap;
   line-height: 60px; /* Vertically center the text there */
 }
+
+
+.comment {
+    padding:10px;
+    border: solid;
+    border-width: .5px;
+    border-color: #D3D3D3;
+    border-radius: 7px;
+}

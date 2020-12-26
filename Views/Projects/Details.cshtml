@@ -1,7 +1,7 @@
 ﻿@model IS4439_CA2.Models.Projects
 @using Microsoft.AspNetCore.Identity
-@inject SignInManager<IdentityUser> SignInManager
-@inject UserManager<IdentityUser> UserManager
+@inject SignInManager<ApplicationUser> SignInManager
+@inject UserManager<ApplicationUser> UserManager
 
 <div class="container-fluid tm-container-content tm-mt-60">
     <div class="row mb-4">
@@ -26,10 +26,21 @@
                                 c = "carousel-item";
                             }
                             i++;
+                            if (Model.isVideo)
+                            {
+                                        <div class="@c">
+                                            <video autoplay muted loop controls id="tm-video">
+                                                <source src="@Url.Content(String.Format(image.imageRoute))" type="video/mp4">
+                                            </video>
+                                        </div>
+                            }
+                            else
+                            {
+                                <div class="@c">
+                                    <img class="d-block w-100" alt=@image.ProjectImagesID src="@Url.Content(String.Format(image.imageRoute))">
+                                </div>
+                            }
 
-                            <div class="@c">
-                                <img class="d-block w-100" alt=@image.ProjectImagesID src="@Url.Content(String.Format(image.imageRoute))">
-                            </div>
                         }
                     }
 
@@ -65,36 +76,50 @@
                     <h2 class="tm-text-gray-dark mb-3">Resolution:</h2>
                     <p><span class="tm-text-primary">@Model.Resolution</span></p>
                 </div>
+                @if (SignInManager.IsSignedIn(User))
+                {
+                        @if (UserManager.GetUserAsync(User).Result.IsAdmin)
+                        {
+                            <a asp-controller="Projects" asp-action="Edit" asp-route-id=@Model.ProjectsID> Edit Project </a>
+                            <a asp-controller="Projects" asp-action="Delete" asp-route-id=@Model.ProjectsID> Edit Project </a>
+
+                        }
+                }
             </div>
 
 
         </div>
-        <div class="col mb-0">
-            <form asp-action="AddComment" method="post">
+        <div class="col pb-2">
+            <form asp-controller="ProjectComments" asp-action="Create" method="post">
                 <div class="form-group">
+                    <h3>@TempData["CommentError"]</h3>                    
                     <label for="comment">Your Comment</label>
-                    <textarea name="CommentText" class="form-control" rows="3"></textarea>
+                    @if (SignInManager.IsSignedIn(User))
+                    {
+                        <textarea name="CommentText" class="form-control" rows="3"></textarea>
+                    }
+                    else
+                    {
+                        <textarea name="CommentText" class="form-control" rows="3" readonly> Please Sign in to leave a comment</textarea>
+
+                    }
                 </div>
-                <input name="ProjectId" value=@Model.ProjectsID hidden />
-                <button type="submit" class="btn btn-default">Send</button>
+                <input name="ProjectID" value=@Model.ProjectsID hidden />
+                <button type="submit" class="btn btn-default float-right">Add Comment</button>
             </form>
         </div>
 
-
     </div>
     @{
-        if (SignInManager.IsSignedIn(User))
-        {
-            <p>@User.Identity.Name</p>
-        }
         foreach (var comment in Model.ProjectCommentsID)
         {
-
-            <div class="row mb-20">
-                <div class="comment-text w-100">
-                    <h6 class="font-medium">James Thomas</h6> <span class="m-b-15 d-block">@comment.CommentText </span>
-                    <div class="comment-footer"> <span class="text-muted float-right">@comment.CommentTimeStamp</span> <button type="button" class="btn btn-cyan btn-sm">Edit</button> <button type="button" class="btn btn-success btn-sm">Publish</button> <button type="button" class="btn btn-danger btn-sm">Delete</button> </div>
-                </div>
+            <div class="row pb-2">
+                    <div class="comment" style="width:100%">
+                        <div class="comment-text w-100">
+                            <h6 class="font-medium">@comment.ApplicationUser.FullName</h6> <span class="m-b-15 d-block">@comment.CommentText </span>
+                            <div class="comment-footer" style="width:100%"><p class="text-muted float-right">@comment.CommentTimeStamp</p>  </div>
+                        </div>
+                    </div>
             </div>
         }
     }

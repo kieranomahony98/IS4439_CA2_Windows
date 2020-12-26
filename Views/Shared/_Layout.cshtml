@@ -9,7 +9,13 @@
     <link rel="stylesheet" href="~/vendor/fontawesome/css/all.min.css" />
     <link rel="stylesheet" href="~/vendor/assets/css/templatemo-style.css" />
     <link rel="stylesheet" href="~/css/layout.css" />
-
+    <style>
+        .logo{
+            max-height:350px;
+            height:auto;
+            width:100%
+        }
+    </style>
 </head>
 <body>
     <div id="loader-wrapper">
@@ -36,15 +42,19 @@
                                     <a class="nav-link nav-link-1" asp-controller="Projects" asp-action="Index">Photos</a>
                                 </li>
                                 <li class="nav-item">
-                                    <a class="nav-link nav-link-2" asp-route="VideoProjects">Videos</a>
+                                    <a class="nav-link nav-link-2" asp-controller="Projects" asp-action="Videos">Videos</a>
                                 </li>
                                 <partial name="_LoginPartial" />
                             </ul>
                         </div>
-                
+
                     </div>
                 </div>
             </nav>
+            <div class="banner">
+                <img src="~/logo_shay.png" class="logo"/>
+
+            </div>
         </header>
         <div class="container">
             <main role="main" class="pb-3">

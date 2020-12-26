@@ -8,6 +8,10 @@
   <ItemGroup>
     <Compile Remove="Areas\Identity\Pages\Account\LoginWith2fa.cshtml.cs" />
     <Compile Remove="Areas\Identity\Pages\Account\LoginWithRecoveryCode.cshtml.cs" />
+    <Compile Remove="Migrations\20201223152102_USERComment.cs" />
+    <Compile Remove="Migrations\20201223152102_USERComment.Designer.cs" />
+    <Compile Remove="Migrations\20201223154320_commentSetup.cs" />
+    <Compile Remove="Migrations\20201223154320_commentSetup.Designer.cs" />
   </ItemGroup>
 
   <ItemGroup>

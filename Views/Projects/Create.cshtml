@@ -1,12 +1,16 @@
 ﻿@model IS4439_CA2.Models.Projects
 
-
-
 <h4>Projects</h4>
 <hr />
 
 <div class="row justify-content-center mt-20">
+    @if (ViewData["LoginFail"] != null)
+    {
+        <h4 class="text-danger"></h4>
+
+    }
     <div class="col-md-4">
+
         <form asp-action="Create" method="post" enctype="multipart/form-data">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             <div class="form-group">

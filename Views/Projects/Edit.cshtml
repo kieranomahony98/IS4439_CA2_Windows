@@ -1,34 +1,25 @@
 ﻿@model IS4439_CA2.Models.Projects
 
-@{
-    Layout = null;
-}
 
-<!DOCTYPE html>
 
-<html>
-<head>
-    <meta name="viewport" content="width=device-width" />
-    <title>Edit</title>
-</head>
-<body>
-
-<h4>Projects</h4>
+<h4>@Model.ProjectTitle</h4>
 <hr />
-<div class="row">
+<div class="row justify-content-center mt-20">
+
     <div class="col-md-4">
         <form asp-action="Edit">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             <input type="hidden" asp-for="ProjectsID" />
-            <div class="form-group">
-                <label asp-for="ProjectDescription" class="control-label"></label>
-                <input asp-for="ProjectDescription" class="form-control" />
-                <span asp-validation-for="ProjectDescription" class="text-danger"></span>
-            </div>
+
             <div class="form-group">
                 <label asp-for="ProjectTitle" class="control-label"></label>
                 <input asp-for="ProjectTitle" class="form-control" />
                 <span asp-validation-for="ProjectTitle" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="ProjectDescription" class="control-label"></label>
+                <textarea asp-for="ProjectDescription" class="form-control" rows="5">@Model.ProjectDescription</textarea>
+                <span asp-validation-for="ProjectDescription" class="text-danger"></span>
             </div>
             <div class="form-group">
                 <label asp-for="DateCompleted" class="control-label"></label>
@@ -56,8 +47,3 @@
     <a asp-action="Index">Back to List</a>
 </div>
 
-@section Scripts {
-    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
-}
-</body>
-</html>

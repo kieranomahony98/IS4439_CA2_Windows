@@ -4,14 +4,16 @@ using IS4439_CA2.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
-namespace IS4439_CA2.Data.Migrations
+namespace IS4439_CA2.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20201223155353_UserIdApp")]
+    partial class UserIdApp
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -31,15 +33,15 @@ namespace IS4439_CA2.Data.Migrations
                         .IsConcurrencyToken()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<DateTime>("DOB")
-                        .HasColumnType("datetime2");
-
                     b.Property<string>("Email")
                         .HasColumnType("nvarchar(256)")
                         .HasMaxLength(256);
 
                     b.Property<bool>("EmailConfirmed")
                         .HasColumnType("bit");
+
+                    b.Property<string>("FullName")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<bool>("IsAdmin")
                         .HasColumnType("bit");
@@ -80,9 +82,6 @@ namespace IS4439_CA2.Data.Migrations
                         .HasColumnType("nvarchar(256)")
                         .HasMaxLength(256);
 
-                    b.Property<string>("fullName")
-                        .HasColumnType("nvarchar(max)");
-
                     b.HasKey("Id");
 
                     b.HasIndex("NormalizedEmail")
@@ -103,6 +102,9 @@ namespace IS4439_CA2.Data.Migrations
                         .HasColumnType("int")
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
+                    b.Property<string>("ApplicationUserID")
+                        .HasColumnType("nvarchar(450)");
+
                     b.Property<string>("CommentText")
                         .HasColumnType("nvarchar(max)");
 
@@ -112,17 +114,11 @@ namespace IS4439_CA2.Data.Migrations
                     b.Property<int>("ProjectId")
                         .HasColumnType("int");
 
-                    b.Property<int>("UserID")
-                        .HasColumnType("int");
-
-                    b.Property<string>("applicationUserId")
-                        .HasColumnType("nvarchar(450)");
-
                     b.HasKey("ProjectCommentsID");
 
-                    b.HasIndex("ProjectId");
+                    b.HasIndex("ApplicationUserID");
 
-                    b.HasIndex("applicationUserId");
+                    b.HasIndex("ProjectId");
 
                     b.ToTable("ProjectComments");
                 });
@@ -331,15 +327,15 @@ namespace IS4439_CA2.Data.Migrations
 
             modelBuilder.Entity("IS4439_CA2.Models.ProjectComments", b =>
                 {
+                    b.HasOne("IS4439_CA2.Models.ApplicationUser", "ApplicationUser")
+                        .WithMany("projectComments")
+                        .HasForeignKey("ApplicationUserID");
+
                     b.HasOne("IS4439_CA2.Models.Projects", "Project")
                         .WithMany("ProjectCommentsID")
                         .HasForeignKey("ProjectId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-
-                    b.HasOne("IS4439_CA2.Models.ApplicationUser", "applicationUser")
-                        .WithMany("projectComments")
-                        .HasForeignKey("applicationUserId");
                 });
 
             modelBuilder.Entity("IS4439_CA2.Models.ProjectImages", b =>

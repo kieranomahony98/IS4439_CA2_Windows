@@ -9,10 +9,7 @@ namespace IS4439_CA2.Models
     public class ApplicationUser : IdentityUser
     {
         [PersonalData]
-        public string fullName { get; set; }
-        [PersonalData]
-        public DateTime DOB { get; set; }
-
+        public string FullName { get; set; }
         public string Occupation { get; set; }
 
         public bool IsAdmin { get; set; }

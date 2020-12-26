@@ -28,6 +28,8 @@ namespace IS4439_CA2
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddMvc(options => options.EnableEndpointRouting = false);
+
             services.AddDbContext<ApplicationDbContext>(options =>
                 options.UseSqlServer(
                     Configuration.GetConnectionString("DefaultConnection")));
@@ -51,6 +53,8 @@ namespace IS4439_CA2
                 // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
                 app.UseHsts();
             }
+
+            app.UseStatusCodePagesWithRedirects("Error?statusCode={0}");
             app.UseHttpsRedirection();
             app.UseStaticFiles();
 
@@ -59,12 +63,18 @@ namespace IS4439_CA2
             app.UseAuthentication();
             app.UseAuthorization();
 
+            app.UseMvc(routes =>
+            {
+                routes.MapRoute("Default", "/", new { Controller = "Projects", Action = "Index" });
+            });
+
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllerRoute(
                     name: "default",
                     pattern: "{controller=Home}/{action=Index}/{id?}");
                 endpoints.MapRazorPages();
+                
             });
         }
     }

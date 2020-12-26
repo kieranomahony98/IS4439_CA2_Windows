@@ -7,23 +7,45 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using IS4439_CA2.Data;
 using IS4439_CA2.Models;
+using System.Security.Claims;
+using System.Diagnostics;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 
 namespace IS4439_CA2.Controllers
+
 {
+    [Authorize]
     public class ProjectCommentsController : Controller
     {
         private readonly ApplicationDbContext _context;
+        private readonly UserManager<ApplicationUser> _User;
 
-        public ProjectCommentsController(ApplicationDbContext context)
+
+        public ProjectCommentsController(ApplicationDbContext context, UserManager<ApplicationUser> user)
         {
             _context = context;
+            _User = user;
+
         }
 
         // GET: ProjectComments
         public async Task<IActionResult> Index()
         {
-            var applicationDbContext = _context.ProjectComments.Include(p => p.Project);
-            return View(await applicationDbContext.ToListAsync());
+            var applicationDbContext = _context.ProjectComments.Include(p => p.Project).Where(c => c.ApplicationUserID == User.FindFirst(ClaimTypes.NameIdentifier).Value);
+            var myComments = await applicationDbContext.ToListAsync();
+               
+            return View(myComments);
+        }
+        [Authorize]
+        public async Task<IActionResult> AdminView()
+        {
+            ApplicationUser user =  await _User.GetUserAsync(HttpContext.User);
+            if (!user.IsAdmin) return Redirect("/");
+
+            var comments = await _context.ProjectComments.ToListAsync();
+
+            return View(comments);
         }
 
         // GET: ProjectComments/Details/5
@@ -53,24 +75,26 @@ namespace IS4439_CA2.Controllers
             return View();
         }
 
-        // POST: ProjectComments/Create
-        // To protect from overposting attacks, enable the specific properties you want to bind to, for 
-        // more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
+
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("ProjectCommentsID,CommentText,CommentTimeStamp,ProjectId")] ProjectComments projectComments)
+
+        public async Task<IActionResult> Create([Bind("ProjectCommentsID,CommentText,ProjectID")] ProjectComments projectComments)
         {
+            projectComments.CommentTimeStamp = DateTime.Today;
+            projectComments.ApplicationUserID = User.FindFirstValue(ClaimTypes.NameIdentifier);
             if (ModelState.IsValid)
             {
                 _context.Add(projectComments);
                 await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
+                return Redirect($"/Projects/Details/{projectComments.ProjectID}");
             }
-            ViewData["ProjectId"] = new SelectList(_context.Projects, "ProjectsID", "ProjectsID", projectComments.ProjectId);
-            return View(projectComments);
+            TempData["CommentError"] = "Unable to add comment, please try again later";
+            return Redirect($"/Projects/Details/{projectComments.ProjectID}");
         }
 
         // GET: ProjectComments/Edit/5
+
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null)
@@ -78,12 +102,18 @@ namespace IS4439_CA2.Controllers
                 return NotFound();
             }
 
-            var projectComments = await _context.ProjectComments.FindAsync(id);
+            ProjectComments projectComments = await _context.ProjectComments
+                .Include(p => p.Project)
+                .FirstOrDefaultAsync(c => c.ProjectCommentsID == id);
+                
+
             if (projectComments == null)
             {
                 return NotFound();
             }
-            ViewData["ProjectId"] = new SelectList(_context.Projects, "ProjectsID", "ProjectsID", projectComments.ProjectId);
+           
+            ViewData["ProjectID"] =  projectComments.ProjectID;
+            ViewData["ProjectTitle"] = projectComments.Project.ProjectTitle;
             return View(projectComments);
         }
 
@@ -92,13 +122,14 @@ namespace IS4439_CA2.Controllers
         // more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("ProjectCommentsID,CommentText,CommentTimeStamp,ProjectId")] ProjectComments projectComments)
+
+        public async Task<IActionResult> Edit(int id, [Bind("ProjectCommentsID,CommentText,CommentTimeStamp,ProjectID")] ProjectComments projectComments)
         {
             if (id != projectComments.ProjectCommentsID)
             {
                 return NotFound();
             }
-
+            projectComments.ApplicationUserID = User.FindFirstValue(ClaimTypes.NameIdentifier);
             if (ModelState.IsValid)
             {
                 try
@@ -119,11 +150,13 @@ namespace IS4439_CA2.Controllers
                 }
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["ProjectId"] = new SelectList(_context.Projects, "ProjectsID", "ProjectsID", projectComments.ProjectId);
+            ViewData["ProjectId"] = new SelectList(_context.Projects, "ProjectsID", "ProjectsID", projectComments.ProjectID);
             return View(projectComments);
         }
 
         // GET: ProjectComments/Delete/5
+     
+
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null)
@@ -145,6 +178,7 @@ namespace IS4439_CA2.Controllers
         // POST: ProjectComments/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
+
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
             var projectComments = await _context.ProjectComments.FindAsync(id);
