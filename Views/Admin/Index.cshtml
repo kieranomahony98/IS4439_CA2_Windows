@@ -1,0 +1,58 @@
+﻿@model IEnumerable<IS4439_CA2.Models.ApplicationUser>
+
+@{
+    if (TempData["Updated"] != null)
+    {
+        <h2 class="alert-success">@TempData["Updated"]</h2>
+    }
+}
+<table class="table">
+
+
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.UserName)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Email)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.FullName)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Occupation)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.IsAdmin)
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.UserName)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Email)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.FullName)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Occupation)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.IsAdmin)
+            </td>
+            <td>
+                <a asp-controller="Admin" asp-action="Edit" asp-route-id="@item.Id">Change Admin Privilages</a>
+            </td>
+        </tr>
+        }
+    </tbody>
+</table>
+

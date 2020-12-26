@@ -84,7 +84,7 @@ namespace IS4439_CA2.Controllers
             if (!user.IsAdmin)
             {
                 //Assigning my own status code just for completion to the end user
-                ViewData["Error"] = "401: You do not have the appropiate permissions to create projects!";
+                TempData["Error"] = "401: You do not have the appropiate permissions to create projects!";
                 return RedirectToAction(nameof(Index));
             }
 
@@ -101,7 +101,7 @@ namespace IS4439_CA2.Controllers
         {
             if (formFiles == null)
             {
-                ViewData["Error"] = "Please uploade at least one image!";
+                TempData["Error"] = "Please upload at least one image!";
                 return View();
             }
             var user = await GetCurrentUser();
@@ -143,6 +143,7 @@ namespace IS4439_CA2.Controllers
                 newProject.ProjectImages = projectImages;
                 _context.Add(newProject);
                 await _context.SaveChangesAsync();
+                TempData["Success"] = "Project sucessfully created";
                 return RedirectToAction(nameof(Index));
             }
             return View();
@@ -160,7 +161,7 @@ namespace IS4439_CA2.Controllers
             if (!applicationUser.IsAdmin)
             {
                 //Assigning my own status code just for completion to the end user
-                ViewData["Error"] = "401: You do not have the appropiate permissions to create projects!";
+                TempData["Error"] = "401: You do not have the appropiate permissions to create projects!";
                 return RedirectToAction("Details");
             }
             var projects = await _context.Projects.FindAsync(id);
@@ -199,6 +200,7 @@ namespace IS4439_CA2.Controllers
                         throw;
                     }
                 }
+                TempData["Success"] = "Project Successfully updated";
                 return RedirectToAction(nameof(Index));
             }
             return View(projects);
@@ -240,6 +242,8 @@ namespace IS4439_CA2.Controllers
             var projects = await _context.Projects.FindAsync(id);
             _context.Projects.Remove(projects);
             await _context.SaveChangesAsync();
+            TempData["Success"] = "Project Successfully deleted";
+
             return RedirectToAction(nameof(Index));
         }
 

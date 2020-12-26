@@ -1,6 +1,11 @@
 ﻿@model IEnumerable<IS4439_CA2.Models.ProjectComments>
 
-
+@{ 
+    if(TempData["Updated"] != null)
+    {
+        <h2 class="badge-success">@TempData["Updated"]</h2>
+    }
+}
 <table class="table">
     <thead>
         <tr>

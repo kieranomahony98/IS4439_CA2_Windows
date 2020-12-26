@@ -2,6 +2,17 @@
 
 
 <div class="container-fluid tm-container-content tm-mt-60">
+    @{
+        if (TempData["Error"] != null)
+        {
+            <h3 class="badge-warning">@TempData["Error"]</h3>
+        }
+        if (TempData["Success"] != null)
+        {
+            <h3 class="badge-success">@TempData["Success"]</h3>
+
+        }
+    }
     <div class="row mb-4">
         <h2 class="col-6 tm-text-primary">
             Latest Projects

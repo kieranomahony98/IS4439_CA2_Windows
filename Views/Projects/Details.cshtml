@@ -4,6 +4,13 @@
 @inject UserManager<ApplicationUser> UserManager
 
 <div class="container-fluid tm-container-content tm-mt-60">
+    @{
+        if (TempData["Error"] != null)
+        {
+            <h3 class="badge-warning">@TempData["Error"]</h3>
+        }
+ 
+    }
     <div class="row mb-4">
         <h2 class="col-12 tm-text-primary">@Model.ProjectTitle</h2>
     </div>
@@ -28,11 +35,11 @@
                             i++;
                             if (Model.isVideo)
                             {
-                                        <div class="@c">
-                                            <video autoplay muted loop controls id="tm-video">
-                                                <source src="@Url.Content(String.Format(image.imageRoute))" type="video/mp4">
-                                            </video>
-                                        </div>
+                                <div class="@c">
+                                    <video autoplay muted loop controls id="tm-video">
+                                        <source src="@Url.Content(String.Format(image.imageRoute))" type="video/mp4">
+                                    </video>
+                                </div>
                             }
                             else
                             {
@@ -63,8 +70,6 @@
                 <p class="mb-4">
                     @Model.ProjectDescription
                 </p>
-
-
                 <div class="mr-4 mb-2">
                     <h2 class="tm-text-gray-dark mb-3">Format: </h2>
                     <p><span class="tm-text-primary">JPG</span></p>
@@ -78,12 +83,11 @@
                 </div>
                 @if (SignInManager.IsSignedIn(User))
                 {
-                        @if (UserManager.GetUserAsync(User).Result.IsAdmin)
-                        {
-                            <a asp-controller="Projects" asp-action="Edit" asp-route-id=@Model.ProjectsID> Edit Project </a>
-                            <a asp-controller="Projects" asp-action="Delete" asp-route-id=@Model.ProjectsID> Edit Project </a>
-
-                        }
+                    @if (UserManager.GetUserAsync(User).Result.IsAdmin)
+                    {
+                        <a asp-controller="Projects" asp-action="Edit" asp-route-id=@Model.ProjectsID> Edit Project </a>
+                        <a asp-controller="Projects" asp-action="Delete" asp-route-id=@Model.ProjectsID> Delete Project </a>
+                    }
                 }
             </div>
 
@@ -92,7 +96,7 @@
         <div class="col pb-2">
             <form asp-controller="ProjectComments" asp-action="Create" method="post">
                 <div class="form-group">
-                    <h3>@TempData["CommentError"]</h3>                    
+                    <h3>@TempData["CommentError"]</h3>
                     <label for="comment">Your Comment</label>
                     @if (SignInManager.IsSignedIn(User))
                     {
@@ -114,12 +118,12 @@
         foreach (var comment in Model.ProjectCommentsID)
         {
             <div class="row pb-2">
-                    <div class="comment" style="width:100%">
-                        <div class="comment-text w-100">
-                            <h6 class="font-medium">@comment.ApplicationUser.FullName</h6> <span class="m-b-15 d-block">@comment.CommentText </span>
-                            <div class="comment-footer" style="width:100%"><p class="text-muted float-right">@comment.CommentTimeStamp</p>  </div>
-                        </div>
+                <div class="comment" style="width:100%">
+                    <div class="comment-text w-100">
+                        <h6 class="font-medium">@comment.ApplicationUser.FullName</h6> <span class="m-b-15 d-block">@comment.CommentText </span>
+                        <div class="comment-footer" style="width:100%"><p class="text-muted float-right">@comment.CommentTimeStamp</p>  </div>
                     </div>
+                </div>
             </div>
         }
     }

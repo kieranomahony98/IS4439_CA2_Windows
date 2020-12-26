@@ -48,7 +48,6 @@ namespace IS4439_CA2.Controllers
             return View(comments);
         }
 
-        // GET: ProjectComments/Details/5
         public async Task<IActionResult> Details(int? id)
         {
             if (id == null)
@@ -67,8 +66,6 @@ namespace IS4439_CA2.Controllers
             return View(projectComments);
         }
 
-        // GET: ProjectComments/Create
-
         public IActionResult Create()
         {
             ViewData["ProjectId"] = new SelectList(_context.Projects, "ProjectsID", "ProjectsID");
@@ -78,7 +75,6 @@ namespace IS4439_CA2.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-
         public async Task<IActionResult> Create([Bind("ProjectCommentsID,CommentText,ProjectID")] ProjectComments projectComments)
         {
             projectComments.CommentTimeStamp = DateTime.Today;
@@ -93,7 +89,6 @@ namespace IS4439_CA2.Controllers
             return Redirect($"/Projects/Details/{projectComments.ProjectID}");
         }
 
-        // GET: ProjectComments/Edit/5
 
         public async Task<IActionResult> Edit(int? id)
         {
@@ -117,9 +112,6 @@ namespace IS4439_CA2.Controllers
             return View(projectComments);
         }
 
-        // POST: ProjectComments/Edit/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to, for 
-        // more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
 
@@ -153,9 +145,7 @@ namespace IS4439_CA2.Controllers
             ViewData["ProjectId"] = new SelectList(_context.Projects, "ProjectsID", "ProjectsID", projectComments.ProjectID);
             return View(projectComments);
         }
-
-        // GET: ProjectComments/Delete/5
-     
+   
 
         public async Task<IActionResult> Delete(int? id)
         {
@@ -171,11 +161,10 @@ namespace IS4439_CA2.Controllers
             {
                 return NotFound();
             }
-
+            TempData["Updated"] = "Comment Succesfully Removed";
             return View(projectComments);
         }
 
-        // POST: ProjectComments/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
 
