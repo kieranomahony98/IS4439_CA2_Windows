@@ -22,7 +22,7 @@ namespace IS4439_CA2
                 try
                 {
                     var context = services.GetRequiredService<ApplicationDbContext>();
-                    DBInitialiser.Initialise(context);
+                    DBInitialiser.InitialiseAsync(context);
                 }catch(Exception e)
                 {
                     Console.WriteLine("Failed to get scope " + e.Message);

@@ -26,7 +26,7 @@
             <th>
                 @Html.DisplayNameFor(model => model.IsAdmin)
             </th>
-            <th></th>
+            <th>Actions</th>
         </tr>
     </thead>
     <tbody>
@@ -46,7 +46,7 @@
                 @Html.DisplayFor(modelItem => item.Occupation)
             </td>
             <td>
-                @Html.DisplayFor(modelItem => item.IsAdmin)
+                <p>@item.IsAdmin</p>
             </td>
             <td>
                 <a asp-controller="Admin" asp-action="Edit" asp-route-id="@item.Id">Change Admin Privilages</a>

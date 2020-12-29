@@ -1,4 +1,6 @@
 ﻿using IS4439_CA2.Models;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -9,8 +11,10 @@ namespace IS4439_CA2.Data
 {
     public class DBInitialiser
     {
-        public static void Initialise(ApplicationDbContext context)
+
+        public static void InitialiseAsync(ApplicationDbContext context)
         {
+     
             context.Database.EnsureCreated();
 
             if (!context.Projects.Any())

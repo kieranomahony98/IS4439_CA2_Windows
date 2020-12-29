@@ -76,6 +76,8 @@ namespace IS4439_CA2
                 endpoints.MapRazorPages();
                 
             });
+
+        
         }
     }
 }

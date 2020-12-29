@@ -75,15 +75,30 @@ namespace IS4439_CA2.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("ProjectCommentsID,CommentText,ProjectID")] ProjectComments projectComments)
+        public async Task<IActionResult> Create([Bind("ProjectCommentsID,CommentText,ProjectID,ApplicationUserID")] ProjectComments projectComments)
         {
             projectComments.CommentTimeStamp = DateTime.Today;
             projectComments.ApplicationUserID = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            Debug.WriteLine(projectComments.ApplicationUserID);
+
             if (ModelState.IsValid)
             {
+                Debug.WriteLine(projectComments.CommentText);
+                Debug.WriteLine(projectComments.ProjectID);
                 _context.Add(projectComments);
                 await _context.SaveChangesAsync();
                 return Redirect($"/Projects/Details/{projectComments.ProjectID}");
+            }
+            if (!ModelState.IsValid)
+            {
+                var errors = ModelState.SelectMany(x => x.Value.Errors.Select(z => z.Exception));
+
+                // Breakpoint, Log or examine the list with Exceptions.
+                foreach(var error in errors)
+                {
+                    Debug.WriteLine(error);
+                }
+
             }
             TempData["CommentError"] = "Unable to add comment, please try again later";
             return Redirect($"/Projects/Details/{projectComments.ProjectID}");

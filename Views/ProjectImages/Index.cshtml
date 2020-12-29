@@ -1,0 +1,18 @@
+﻿@model IEnumerable<IS4439_CA2.Models.ProjectImages>
+
+
+
+<div class="container-fluid tm-container-content tm-mt-60">
+    <div class="row tm-mb-90 tm-gallery">
+        @foreach (var item in Model)
+        {
+            <div class="col-xl-4 col-lg-4 col-md-6 col-sm-6 col-3 mb-5">
+                <img class="d-block w-100" src=@Url.Content(String.Format(item.imageRoute)) alt=@item.imageRoute />
+
+                <a asp-action="Edit" asp-route-id="@item.ProjectImagesID">Edit</a>
+                <a asp-action="Details" asp-route-id="@item.ProjectImagesID">Details</a>
+                <a asp-action="Delete" asp-route-id="@item.ProjectImagesID">Delete</a>
+                </div>
+                }
+    </div>
+</div>

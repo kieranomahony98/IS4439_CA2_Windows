@@ -53,14 +53,18 @@ namespace IS4439_CA2.Areas.Identity.Pages.Account
             public string Email { get; set; }
             
             [Required]
-            [StringLength(100, ErrorMessage = "The {0} must be at least {2} and at max {1} characters long.", MinimumLength = 6)]
+            [StringLength(100, ErrorMessage = "The {0} must be at least {2} and at max {1} characters long.", MinimumLength = 4)]
             [Display(Name ="User Name")]
             public string UserName { get; set; }
 
             [Required]
-            [StringLength(100, ErrorMessage = "The {0} must be at least {2} and at max {1} characters long.", MinimumLength = 6)]
+            [StringLength(100, ErrorMessage = "The {0} must be at least {2} and at max {1} characters long.", MinimumLength = 3)]
             [Display(Name = "Occupation")]
             public string Occupation { get; set; }
+            [Required]
+            [StringLength(100, ErrorMessage = "The {0} must be at least {2} and at max {1} characters long.", MinimumLength = 3)]
+            [Display(Name = "Full Name")]
+            public string FullName { get; set; }
 
             [Required]
             [StringLength(100, ErrorMessage = "The {0} must be at least {2} and at max {1} characters long.", MinimumLength = 6)]
@@ -99,7 +103,7 @@ namespace IS4439_CA2.Areas.Identity.Pages.Account
             {
         
 
-                var user = new ApplicationUser { UserName = Input.UserName, Email = Input.Email, Occupation = Input.Occupation, IsAdmin= false };
+                var user = new ApplicationUser { UserName = Input.UserName, Email = Input.Email, Occupation = Input.Occupation, FullName=Input.FullName, IsAdmin= false };
                 var result = await _userManager.CreateAsync(user, Input.Password);
                 if (result.Succeeded)
                 {

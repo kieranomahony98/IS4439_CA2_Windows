@@ -13,11 +13,10 @@ namespace IS4439_CA2.Data
         public DbSet<ProjectImages> ProjectImages { get; set; }
         public DbSet<ProjectComments> ProjectComments { get; set; }
 
-        public DbSet<ProjectVideos> ProjectVideos { get; set; }
-
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
             : base(options)
         {
         }
+
     }
 }

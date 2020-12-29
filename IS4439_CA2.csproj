@@ -12,6 +12,12 @@
     <Compile Remove="Migrations\20201223152102_USERComment.Designer.cs" />
     <Compile Remove="Migrations\20201223154320_commentSetup.cs" />
     <Compile Remove="Migrations\20201223154320_commentSetup.Designer.cs" />
+    <Compile Remove="Migrations\20201226235839_final.cs" />
+    <Compile Remove="Migrations\20201226235839_final.Designer.cs" />
+    <Compile Remove="Migrations\20201227000142_final.cs" />
+    <Compile Remove="Migrations\20201227000142_final.Designer.cs" />
+    <Compile Remove="Migrations\20201227000230_final.cs" />
+    <Compile Remove="Migrations\20201227000230_final.Designer.cs" />
   </ItemGroup>
 
   <ItemGroup>

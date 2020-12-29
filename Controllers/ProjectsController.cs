@@ -76,7 +76,6 @@ namespace IS4439_CA2.Controllers
             return View(projects);
         }
 
-        // GET: Projects/Create
         public async Task<IActionResult> Create()
         {
             var user = await GetCurrentUser();
@@ -91,15 +90,12 @@ namespace IS4439_CA2.Controllers
             return View();
         }
 
-        // POST: Projects/Create
-        // To protect from overposting attacks, enable the specific properties you want to bind to, for 
-        // more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
         [Authorize]
-        public async Task<IActionResult> Create(IFormFileCollection formFiles, int ProjectsID, string ProjectDescription, string ProjectTitle, string DateCompleted, string Resolution, bool isVideo)
+        public async Task<IActionResult> Create(IFormFileCollection formFiles,[Bind("ProjectsID, ProjectTitle, ProjectDescription, DateCompleted, Resolution, isVideo")] Projects newProject)
         {
-            if (formFiles == null)
+            if (formFiles.Count == 0)
             {
                 TempData["Error"] = "Please upload at least one image!";
                 return View();
@@ -111,7 +107,6 @@ namespace IS4439_CA2.Controllers
                 return RedirectToAction(nameof(Index));
             }
 
-            Projects newProject = new Projects() { DateCompleted = DateCompleted, isVideo = isVideo, ProjectDescription = ProjectDescription, ProjectTitle = ProjectTitle, Resolution = Resolution };
             if (ModelState.IsValid)
             {
                 List<ProjectImages> projectImages = new List<ProjectImages>();
@@ -123,8 +118,8 @@ namespace IS4439_CA2.Controllers
                     string myUniqueImageName = Convert.ToString(Guid.NewGuid());
                     string FileExtension = Path.GetExtension(imageName);
                     string fullImageID = myUniqueImageName + FileExtension;
-                    string newProjectTitle = Regex.Replace("fam", @"\s+", "");
-
+                    string newProjectTitle = Regex.Replace(newProject.ProjectTitle, @"\s+", "");
+                    Debug.WriteLine(newProjectTitle);
                     string dir = $"wwwroot/Projects/{newProjectTitle}/{fullImageID}";
                     string path = $"~/Projects/{newProjectTitle}/{fullImageID}";
 
@@ -149,7 +144,6 @@ namespace IS4439_CA2.Controllers
             return View();
         }
 
-        // GET: Projects/Edit/5
         [Authorize]
         public async Task<IActionResult> Edit(int? id)
         {
