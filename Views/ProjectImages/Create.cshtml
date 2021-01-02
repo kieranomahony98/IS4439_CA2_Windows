@@ -1,32 +1,24 @@
 ﻿@model IS4439_CA2.Models.ProjectImages
-
-@{
-    Layout = null;
-}
-
-<!DOCTYPE html>
-
-<html>
-<head>
-    <meta name="viewport" content="width=device-width" />
-    <title>Create</title>
-</head>
-<body>
-
+       
 <h4>ProjectImages</h4>
 <hr />
 <div class="row">
     <div class="col-md-4">
-        <form asp-action="Create">
-            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+        <form asp-action="Create" method="post" enctype="multipart/form-data">
+            @{
+                if (TempData["Error"] != null)
+                {
+                    <h2 class="badge-warning">@TempData["Error"]</h2>
+                }
+            }
+
             <div class="form-group">
-                <label asp-for="imageRoute" class="control-label"></label>
-                <input asp-for="imageRoute" class="form-control" />
-                <span asp-validation-for="imageRoute" class="text-danger"></span>
+                <label for="ProjectId" class="control-label"></label>
+                <input name="ProjectId" id="ProjectId" class="form-control" value=@ViewData["ProjectId"] readonly />
             </div>
             <div class="form-group">
-                <label asp-for="ProjectId" class="control-label"></label>
-                <select asp-for="ProjectId" class ="form-control" asp-items="ViewBag.ProjectId"></select>
+                <label for="formFiles">Upload one or more files using this form:</label>
+                <input type="file" name="formFiles" id="formFiles" multiple />
             </div>
             <div class="form-group">
                 <input type="submit" value="Create" class="btn btn-primary" />
@@ -39,8 +31,4 @@
     <a asp-action="Index">Back to List</a>
 </div>
 
-@section Scripts {
-    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
-}
-</body>
-</html>
+

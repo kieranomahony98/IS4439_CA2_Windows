@@ -7,21 +7,40 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using IS4439_CA2.Data;
 using IS4439_CA2.Models;
+using System.IO;
+using Microsoft.AspNetCore.Http;
+using System.Net.Http.Headers;
+using System.Text.RegularExpressions;
+using System.Diagnostics;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 
 namespace IS4439_CA2.Controllers
 {
+    [Authorize]
     public class ProjectImagesController : Controller
     {
         private readonly ApplicationDbContext _context;
-
-        public ProjectImagesController(ApplicationDbContext context)
+        private readonly UserManager<ApplicationUser> _User;
+        public ProjectImagesController(ApplicationDbContext context, UserManager<ApplicationUser> user)
         {
             _context = context;
+            _User = user;
+
+        }
+        private async Task<ApplicationUser> GetCurrentUser()
+        {
+            return await _User.GetUserAsync(HttpContext.User);
         }
 
         // GET: ProjectImages
         public async Task<IActionResult> Index(int id)
         {
+            ApplicationUser user = await GetCurrentUser();
+            if(user == null || !user.IsAdmin)
+            {
+                return Redirect("/");
+            }
             var applicationDbContext = _context.ProjectImages.Include(p => p.Project).Where(p => p.ProjectId == id);
             return View(await applicationDbContext.ToListAsync());
         }
@@ -29,6 +48,12 @@ namespace IS4439_CA2.Controllers
         // GET: ProjectImages/Details/5
         public async Task<IActionResult> Details(int? id)
         {
+            ApplicationUser user = await GetCurrentUser();
+            if (user == null || !user.IsAdmin)
+            {
+                return Redirect("/");
+            }
+
             if (id == null)
             {
                 return NotFound();
@@ -46,82 +71,86 @@ namespace IS4439_CA2.Controllers
         }
 
         // GET: ProjectImages/Create
-        public IActionResult Create()
+        public IActionResult Create(int? id)
         {
-            ViewData["ProjectId"] = new SelectList(_context.Projects, "ProjectsID", "DateCompleted");
+
+            if (id == null)
+            {
+                return NotFound();
+            }
+
+            ViewData["ProjectId"] = id;
             return View();
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("ProjectImagesID,imageRoute,ProjectId")] ProjectImages projectImages)
+        public async Task<IActionResult> Create(IFormFileCollection formFiles, int ProjectId)
         {
-            if (ModelState.IsValid)
+            ApplicationUser user = await GetCurrentUser();
+            if (user == null || !user.IsAdmin)
             {
-                _context.Add(projectImages);
-                await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
-            }
-            ViewData["ProjectId"] = new SelectList(_context.Projects, "ProjectsID", "DateCompleted", projectImages.ProjectId);
-            return View(projectImages);
-        }
-
-        public async Task<IActionResult> Edit(int? id)
-        {
-            if (id == null)
-            {
-                return NotFound();
+                return Redirect("/");
             }
 
-            var projectImages = await _context.ProjectImages.FindAsync(id);
-            if (projectImages == null)
+            if (formFiles.Count == 0)
             {
-                return NotFound();
+                TempData["Error"] = "Please upload at least one image!";
+                return View();
             }
-            ViewData["ProjectId"] = new SelectList(_context.Projects, "ProjectsID", "DateCompleted", projectImages.ProjectId);
-            return View(projectImages);
-        }
-
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("ProjectImagesID,imageRoute,ProjectId")] ProjectImages projectImages)
-        {
-            if (id != projectImages.ProjectImagesID)
+            Projects project = await _context.Projects.FindAsync(ProjectId);
+            string Dir = project.Dir;
+            List<ProjectImages> pi = new List<ProjectImages>();
+            foreach (IFormFile image in formFiles)
             {
-                return NotFound();
-            }
+                string imageName = ContentDispositionHeaderValue.Parse(image.ContentDisposition).FileName.Trim('"');
+                string myUniqueImageName = Convert.ToString(Guid.NewGuid());
+                string FileExtension = Path.GetExtension(imageName);
+                string fullImageID = myUniqueImageName + FileExtension;
+                
+                string dir = $"wwwroot{Dir}/{fullImageID}";
+                string path = $"~{Dir}/{fullImageID}";
 
-            if (ModelState.IsValid)
-            {
-                try
+                if (!Directory.Exists($"wwwroot{Dir}"))
                 {
-                    _context.Update(projectImages);
+
+                    TempData["Error"] = "Unable to add image, Please try again later";
+                    return View();
+
+                }
+                using (FileStream fs = System.IO.File.Create(dir))
+                {
+                    image.CopyTo(fs);
+                    fs.Flush();
+                }
+                pi.Add(new ProjectImages() { imageRoute = path });
+            }
+
+            foreach(ProjectImages p in pi)
+            {
+                p.ProjectId = ProjectId;
+                if (ModelState.IsValid)
+                {
+                    _context.Add(p);
                     await _context.SaveChangesAsync();
                 }
-                catch (DbUpdateConcurrencyException)
-                {
-                    if (!ProjectImagesExists(projectImages.ProjectImagesID))
-                    {
-                        return NotFound();
-                    }
-                    else
-                    {
-                        throw;
-                    }
-                }
-                return RedirectToAction(nameof(Index));
             }
-            ViewData["ProjectId"] = new SelectList(_context.Projects, "ProjectsID", "DateCompleted", projectImages.ProjectId);
-            return View(projectImages);
+            return RedirectToAction(nameof(Index), new {id = ProjectId } );
         }
 
         public async Task<IActionResult> Delete(int? id)
         {
+            ApplicationUser user = await GetCurrentUser();
+            if (user == null || !user.IsAdmin)
+            {
+                return Redirect("/");
+            }
+
             if (id == null)
             {
                 return NotFound();
             }
-
+           
             var projectImages = await _context.ProjectImages
                 .Include(p => p.Project)
                 .FirstOrDefaultAsync(m => m.ProjectImagesID == id);
@@ -138,15 +167,38 @@ namespace IS4439_CA2.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
+            ApplicationUser user = await GetCurrentUser();
+            if (user == null || !user.IsAdmin)
+            {
+                return Redirect("/");
+            }
+
             var projectImages = await _context.ProjectImages.FindAsync(id);
+            int projectID = projectImages.ProjectId;
             _context.ProjectImages.Remove(projectImages);
             await _context.SaveChangesAsync();
-            return RedirectToAction(nameof(Index));
+            bool isEmpty = await IsProjectEmpty(projectID);
+            if (isEmpty)
+            {
+                return Redirect("/");
+            }
+            return Redirect("/");
         }
 
-        private bool ProjectImagesExists(int id)
+        public async Task<bool> IsProjectEmpty(int id)
         {
-            return _context.ProjectImages.Any(e => e.ProjectImagesID == id);
+            var list = _context.ProjectImages.Where(p => p.ProjectId == id).ToList();
+
+            if(!(list.Count > 0))
+            {
+                var project = await _context.Projects.FindAsync(id);
+                _context.Projects.Remove(project);
+                await _context.SaveChangesAsync();
+                return true;
+            }
+            return false;
+         
         }
     }
+
 }

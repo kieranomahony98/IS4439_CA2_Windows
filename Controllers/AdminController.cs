@@ -34,7 +34,7 @@ namespace IS4439_CA2.Controllers
         {
             var user = await GetCurrentUser();
 
-            if (!user.IsAdmin)
+            if (user == null || !user.IsAdmin)
             {
                 //Assigning my own status code just for completion to the end user
                 TempData["Error"] = "401: You do not have the appropiate permissions to create projects!";
@@ -49,7 +49,7 @@ namespace IS4439_CA2.Controllers
         {
             var u = await GetCurrentUser();
 
-            if (!u.IsAdmin)
+            if (u == null || !u.IsAdmin)
             {
                 //Assigning my own status code just for completion to the end user
                 TempData["Error"] = "401: You do not have the appropiate permissions to create projects!";

@@ -13,6 +13,8 @@ namespace IS4439_CA2.Models
 
         [Required(ErrorMessage = "Please enter a valid comment")]
         [Display(Name ="Comment Text")]
+        [StringLength(250, MinimumLength = 10, ErrorMessage = "Please have the text within 10 and 250 characters")]
+
         public string CommentText { get; set; }
         [Display(Name = "Comment Date")]
         public DateTime CommentTimeStamp { get; set; }

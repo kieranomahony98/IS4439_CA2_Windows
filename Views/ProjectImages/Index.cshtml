@@ -1,18 +1,36 @@
 ﻿@model IEnumerable<IS4439_CA2.Models.ProjectImages>
+@{
+    bool add = false;
+    <div class="container-fluid tm-container-content tm-mt-60">
+        <div class="row tm-mb-90 tm-gallery">
+            @foreach (var item in Model)
+            {
+                <div class="col-xl-4 col-lg-4 col-md-6 col-sm-6 col-3 mb-5">
+                    <img class="d-block w-100" src=@Url.Content(String.Format(item.imageRoute)) alt=@item.imageRoute />
 
-
-
-<div class="container-fluid tm-container-content tm-mt-60">
-    <div class="row tm-mb-90 tm-gallery">
-        @foreach (var item in Model)
-        {
-            <div class="col-xl-4 col-lg-4 col-md-6 col-sm-6 col-3 mb-5">
-                <img class="d-block w-100" src=@Url.Content(String.Format(item.imageRoute)) alt=@item.imageRoute />
-
-                <a asp-action="Edit" asp-route-id="@item.ProjectImagesID">Edit</a>
-                <a asp-action="Details" asp-route-id="@item.ProjectImagesID">Details</a>
-                <a asp-action="Delete" asp-route-id="@item.ProjectImagesID">Delete</a>
+                    <a asp-action="Edit" asp-route-id="@item.ProjectImagesID">Edit</a>
+                    <a asp-action="Details" asp-route-id="@item.ProjectImagesID">Details</a>
+                    <a asp-action="Delete" asp-route-id="@item.ProjectImagesID">Delete</a>
                 </div>
+                if (!add)
+                {
+                    <div class="col-xl-4 col-lg-4 col-md-6 col-sm-6 col-3 mb-5">
+                        <figure class="effect-ming tm-video-item">
+                            <img class="d-block w-100" src=@Url.Content(String.Format("https://img.icons8.com/nolan/96/add-image.png")) alt="addImage" />
+                            <figcaption class="d-flex align-items-center justify-content-center">
+                                <h2>Add Image</h2>
+                                <a asp-controller="ProjectImages" asp-action="Create" asp-route-id="@item.ProjectId">View more</a>
+                            </figcaption>
+                        </figure>
+
+                        <a asp-controller="ProjectImages" asp-action="Create" asp-route-id=@item.ProjectId>Add Image</a>
+                    </div>
+                    add = true;
                 }
+            }
+
+
+        </div>
+
     </div>
-</div>
+}

@@ -28,6 +28,7 @@ namespace IS4439_CA2.Controllers
             _User = user;
 
         }
+ 
 
         // GET: ProjectComments
         public async Task<IActionResult> Index()
@@ -37,11 +38,11 @@ namespace IS4439_CA2.Controllers
                
             return View(myComments);
         }
-        [Authorize]
+       
         public async Task<IActionResult> AdminView()
         {
             ApplicationUser user =  await _User.GetUserAsync(HttpContext.User);
-            if (!user.IsAdmin) return Redirect("/");
+            if (user == null || !user.IsAdmin) return Redirect("/");
 
             var comments = await _context.ProjectComments.ToListAsync();
 
@@ -83,8 +84,7 @@ namespace IS4439_CA2.Controllers
 
             if (ModelState.IsValid)
             {
-                Debug.WriteLine(projectComments.CommentText);
-                Debug.WriteLine(projectComments.ProjectID);
+
                 _context.Add(projectComments);
                 await _context.SaveChangesAsync();
                 return Redirect($"/Projects/Details/{projectComments.ProjectID}");

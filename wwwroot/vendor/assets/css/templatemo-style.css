@@ -563,7 +563,6 @@ select:not([multiple]) {
     background-color: #009999;
 }
 
-.form-control,
 input:-internal-autofill-selected,
 select:not([multiple]) {
     color: #009999 !important;

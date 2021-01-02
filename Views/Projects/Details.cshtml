@@ -67,19 +67,19 @@
             <div class="tm-bg-gray tm-video-details">
                 <h2 class="tm-text-gray-dark mb-3">Project Description:</h2>
 
-                <p class="mb-4">
+                <p class="mb-4 tm-text-gray-dark">
                     @Model.ProjectDescription
                 </p>
                 <div class="mr-4 mb-2">
                     <h2 class="tm-text-gray-dark mb-3">Format: </h2>
-                    <p><span class="tm-text-primary">JPG</span></p>
+                    <p><span class="tm-text-gray-dark">JPG</span></p>
                 </div>
                 <br />
                 <div class="mb-4">
                     <h2 class="tm-text-gray-dark mb-3">Date Published:</h2>
-                    <p><span class="tm-text-primary">@Model.DateCompleted</span></p>
+                    <p><span class="tm-text-gray-dark">@Model.DateCompleted</span></p>
                     <h2 class="tm-text-gray-dark mb-3">Resolution:</h2>
-                    <p><span class="tm-text-primary">@Model.Resolution</span></p>
+                    <p><span class="tm-text-gray-dark">@Model.Resolution</span></p>
                 </div>
                 @if (SignInManager.IsSignedIn(User))
                 {

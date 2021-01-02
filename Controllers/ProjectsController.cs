@@ -80,7 +80,7 @@ namespace IS4439_CA2.Controllers
         {
             var user = await GetCurrentUser();
 
-            if (!user.IsAdmin)
+            if (user == null || !user.IsAdmin)
             {
                 //Assigning my own status code just for completion to the end user
                 TempData["Error"] = "401: You do not have the appropiate permissions to create projects!";
@@ -102,11 +102,14 @@ namespace IS4439_CA2.Controllers
             }
             var user = await GetCurrentUser();
 
-            if (!user.IsAdmin)
+            if (user == null || !user.IsAdmin)
             {
                 return RedirectToAction(nameof(Index));
             }
+            string newProjectTitle = Regex.Replace(newProject.ProjectTitle, @"\s+", "");
 
+            string dir = $"/Projects/{newProjectTitle}/";
+            newProject.Dir = dir;
             if (ModelState.IsValid)
             {
                 List<ProjectImages> projectImages = new List<ProjectImages>();
@@ -118,9 +121,7 @@ namespace IS4439_CA2.Controllers
                     string myUniqueImageName = Convert.ToString(Guid.NewGuid());
                     string FileExtension = Path.GetExtension(imageName);
                     string fullImageID = myUniqueImageName + FileExtension;
-                    string newProjectTitle = Regex.Replace(newProject.ProjectTitle, @"\s+", "");
                     Debug.WriteLine(newProjectTitle);
-                    string dir = $"wwwroot/Projects/{newProjectTitle}/{fullImageID}";
                     string path = $"~/Projects/{newProjectTitle}/{fullImageID}";
 
                     if (!Directory.Exists($"wwwroot/Projects/{newProjectTitle}"))
@@ -128,7 +129,7 @@ namespace IS4439_CA2.Controllers
                         Directory.CreateDirectory($"wwwroot/Projects/{newProjectTitle}");
 
                     }
-                    using (FileStream fs = System.IO.File.Create(dir))
+                    using (FileStream fs = System.IO.File.Create($"wwwroot/Projects/{newProjectTitle}/{fullImageID}"))
                     {
                         image.CopyTo(fs);
                         fs.Flush();
@@ -152,7 +153,8 @@ namespace IS4439_CA2.Controllers
                 return NotFound();
             }
             ApplicationUser applicationUser = await GetCurrentUser();
-            if (!applicationUser.IsAdmin)
+ 
+            if (applicationUser == null || !applicationUser.IsAdmin)
             {
                 //Assigning my own status code just for completion to the end user
                 TempData["Error"] = "401: You do not have the appropiate permissions to create projects!";
@@ -206,7 +208,7 @@ namespace IS4439_CA2.Controllers
         {
 
             ApplicationUser applicationUser = await GetCurrentUser();
-            if (!applicationUser.IsAdmin)
+            if (applicationUser == null || !applicationUser.IsAdmin)
             {
                 //Assigning my own status code just for completion to the end user
                 TempData["Error"] = "401: You do not have the appropiate permissions to create projects!";
