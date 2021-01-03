@@ -11,7 +11,7 @@ namespace IS4439_CA2.Data
 {
     public class DBInitialiser
     {
-        public static async void InitialiseAsync(ApplicationDbContext context)
+        public static void InitialiseAsync(ApplicationDbContext context)
         {
      
             context.Database.EnsureCreated();
