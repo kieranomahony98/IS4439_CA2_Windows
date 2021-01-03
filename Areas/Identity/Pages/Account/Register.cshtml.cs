@@ -53,11 +53,6 @@ namespace IS4439_CA2.Areas.Identity.Pages.Account
             public string Email { get; set; }
             
             [Required]
-            [StringLength(100, ErrorMessage = "The {0} must be at least {2} and at max {1} characters long.", MinimumLength = 4)]
-            [Display(Name ="User Name")]
-            public string UserName { get; set; }
-
-            [Required]
             [StringLength(100, ErrorMessage = "The {0} must be at least {2} and at max {1} characters long.", MinimumLength = 3)]
             [Display(Name = "Occupation")]
             public string Occupation { get; set; }
@@ -89,21 +84,17 @@ namespace IS4439_CA2.Areas.Identity.Pages.Account
             returnUrl = returnUrl ?? Url.Content("~/");
             ExternalLogins = (await _signInManager.GetExternalAuthenticationSchemesAsync()).ToList();
 
-            var userNameCheck = await _userManager.FindByNameAsync(Input.UserName);
             var userEmailCheck = await _userManager.FindByEmailAsync(Input.Email);
             
-            if(userEmailCheck != null || userNameCheck != null)
+            if(userEmailCheck != null)
             {
-                Debug.WriteLine("in fail");
                 ViewData["LoginFail"] = "A User already exists for these credentials";
                 return Page();
             }
             
             if (ModelState.IsValid)
             {
-        
-
-                var user = new ApplicationUser { UserName = Input.UserName, Email = Input.Email, Occupation = Input.Occupation, FullName=Input.FullName, IsAdmin= false };
+                var user = new ApplicationUser { UserName = Input.Email, Email = Input.Email, Occupation = Input.Occupation, FullName=Input.FullName, IsAdmin= false };
                 var result = await _userManager.CreateAsync(user, Input.Password);
                 if (result.Succeeded)
                 {

@@ -11,15 +11,29 @@ namespace IS4439_CA2.Data
 {
     public class DBInitialiser
     {
-
-        public static void InitialiseAsync(ApplicationDbContext context)
+        public static async void InitialiseAsync(ApplicationDbContext context)
         {
      
             context.Database.EnsureCreated();
+            if (!context.Users.Any())
+            {
+                List<ApplicationUser> applicationUsers = new List<ApplicationUser>()
+                {
+                    new ApplicationUser(){Email="kieranomahony@gmail.com",NormalizedEmail="KIERANOMAHONY@GMAIL.COM", FullName="Kieran O Mahony", IsAdmin=true, Occupation="Student", UserName="kieranomahony@gmail.com", NormalizedUserName="KIERANOMAHONY@GMAIL.COM"},
+                    new ApplicationUser(){Email="andrea@gmail.com", NormalizedEmail="ANDREA@GMAIL.COM", FullName="Andrea Visentin", IsAdmin=false, Occupation="Lecture", UserName="andrea@gmail.com", NormalizedUserName="ANDREA@GMAIL.COM"},
+                };
+                PasswordHasher<ApplicationUser> ph = new PasswordHasher<ApplicationUser>();
+
+                foreach (ApplicationUser application in applicationUsers)
+                {
+                    application.PasswordHash = ph.HashPassword(application, "myPassword12*");
+                    context.Users.Add(application);
+                }
+
+                context.SaveChanges();
+            }
             if (!context.Projects.Any())
             {
-
-
                 string imagePathEmpire = "/Projects/behind_the_empire/";
                 string imagePathAnxieteen = "/Projects/anxieteen/";
                 string imagePathWhopper = "/Projects/rise_of_the_whopper/";
@@ -116,6 +130,38 @@ namespace IS4439_CA2.Data
                     context.Projects.Add(project);
                 }
                 context.SaveChanges();
+            }
+            if (!context.ProjectComments.Any())
+            {
+  
+                var applciationUsers =  context.Users.ToList();
+                var projects =  context.Projects.ToList();
+
+                List<string> s = new List<string>();
+                List<int> i = new List<int>();
+                foreach(ApplicationUser a in applciationUsers)
+                {
+                    s.Add(a.Id);                    
+                }
+                foreach(Projects a in projects)
+                {
+                    i.Add(a.ProjectsID);
+                }
+                List<ProjectComments> projectComments = new List<ProjectComments>()
+                {
+                    new ProjectComments(){ApplicationUserID = s[0], ProjectID = i[0], CommentTimeStamp= DateTime.Today, CommentText="Great effort at tackling modern problems"},
+                    new ProjectComments(){ApplicationUserID = s[0], ProjectID = i[2], CommentTimeStamp= DateTime.Today, CommentText="As a star wars lover i found great amusement in this"},
+                    new ProjectComments(){ApplicationUserID = s[1],  ProjectID = i[1],CommentTimeStamp= DateTime.Today, CommentText="A great new method to vote, we could see more of this in the future"},
+                    new ProjectComments(){ApplicationUserID = s[1],  ProjectID = i[1], CommentTimeStamp= DateTime.Today, CommentText="I want a burger now"},
+                };
+                foreach(ProjectComments p in projectComments)
+                {
+                    context.ProjectComments.Add(p);
+                }
+                context.SaveChanges();
+
+
+
             }
         }
     }

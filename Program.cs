@@ -1,5 +1,7 @@
 using IS4439_CA2.Data;
+using IS4439_CA2.Models;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -21,6 +23,7 @@ namespace IS4439_CA2
                 var services = scope.ServiceProvider;
                 try
                 {
+                 
                     var context = services.GetRequiredService<ApplicationDbContext>();
                     DBInitialiser.InitialiseAsync(context);
                 }catch(Exception e)

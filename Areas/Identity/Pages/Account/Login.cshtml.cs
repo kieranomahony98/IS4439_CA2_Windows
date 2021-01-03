@@ -12,6 +12,7 @@ using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.Extensions.Logging;
+using System.Diagnostics;
 
 namespace IS4439_CA2.Areas.Identity.Pages.Account
 {
@@ -78,9 +79,10 @@ namespace IS4439_CA2.Areas.Identity.Pages.Account
 
             if (ModelState.IsValid)
             {
-                // This doesn't count login failures towards account lockout
-                // To enable password failures to trigger account lockout, set lockoutOnFailure: true
                 var result = await _signInManager.PasswordSignInAsync(Input.Email, Input.Password, Input.RememberMe, lockoutOnFailure: false);
+                Debug.WriteLine(Input.Password);
+                Debug.WriteLine(Input.Email);
+
                 if (result.Succeeded)
                 {
                     _logger.LogInformation("User logged in.");
@@ -97,6 +99,7 @@ namespace IS4439_CA2.Areas.Identity.Pages.Account
                 }
                 else
                 {
+                   
                     ModelState.AddModelError(string.Empty, "Invalid login attempt.");
                     return Page();
                 }
